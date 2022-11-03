@@ -21,7 +21,7 @@ def cargarJson():
 
 def ramdomPesos(x, y):
     pesos = dict()
-    pesos = np.random.uniform(0.,1.,size=(x,y))
+    pesos = np.random.uniform(-1.,1.,size=(x,y))/np.sqrt(x*y)
     aux = dict()
     for i in range(len(pesos)):
         aux[i] = list(pesos[i])
