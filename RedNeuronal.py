@@ -3,7 +3,7 @@ from numpy import array
 from csv import reader
 
 from Pesos import Pesos
-from Capa import Capa
+from capa import Capa
 
 class RedNeuronal:
     

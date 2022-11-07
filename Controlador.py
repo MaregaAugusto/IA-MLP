@@ -2,6 +2,8 @@ from RedNeuronal import RedNeuronal
 from matplotlib.pyplot import plot, show
 
 x = RedNeuronal([10, 10], 0.5, 0.5, 0.08, 100, 1000, [True, True, True]) 
+#[10, 10] capa oculta 
+
 x.Propagation()
 x.error_patron_v_total.pop(0)
 plot(x.error_patron_entrenamiento, marker='o', color='blue', label='Entrenamiento')
