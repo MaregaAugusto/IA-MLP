@@ -747,7 +747,7 @@
              <x>230</x>
              <y>30</y>
              <width>481</width>
-             <height>391</height>
+             <height>401</height>
             </rect>
            </property>
            <property name="title">
@@ -4153,7 +4153,7 @@
              <bool>false</bool>
             </property>
            </widget>
-           <widget class="QPushButton" name="pushButton">
+           <widget class="QPushButton" name="validarLetraButton">
             <property name="geometry">
              <rect>
               <x>90</x>
