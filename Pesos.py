@@ -49,6 +49,9 @@ class Pesos:
         self.pesosValidacion = self.pesos
 
     def setPath(self, nDataset):
+        path = 'pesos'
+        if not exists(path):
+            mkdir(path)
         path = 'pesos\\'+nDataset
         if not exists(path):
             mkdir(path)

@@ -6,6 +6,8 @@ from faker import Faker
 import random
 import copy
 import numpy as np
+from os import mkdir
+from os.path import exists
 
 #@markdown Definimos las letras B, D y F
 letraB = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "b"]
@@ -66,15 +68,23 @@ def generador(cantObs,maxDistorsion,sinDistorsion):
   result_test = result[(cantTraining):(cantTraining + cantTest)]
   result_validacion = result[(cantTraining + cantTest):(cantObs)]
 
-  # Una vez que finalizamos el bucle, cargamos este arreglo de salida a un .csv 
+  # Una vez que finalizamos el bucle, cargamos este arreglo de salida a un .csv
+  path = 'dataset'
+    if not exists(path):
+        mkdir(path)
+  path = path+'\\'+cantObs
+  if not exists(path):
+      mkdir(path)
+  
 
   letras_distorsionadas_training = pd.DataFrame(result_training);
-  letras_distorsionadas_training.to_csv(r'dataset\\entrenamiento' + '.csv');
+  letras_distorsionadas_training.to_csv(path+'\\entrenamiento' + '.csv');
 
   letras_distorsionadas_test = pd.DataFrame(result_test);
-  letras_distorsionadas_test.to_csv(r'dataset\\test' + '.csv');
+  #letras_distorsionadas_test.to_csv(r'dataset\\test' + '.csv');
+  letras_distorsionadas_test.to_csv(path+'\\test' + '.csv');
 
   letras_distorsionadas_validacion = pd.DataFrame(result_validacion);
-  letras_distorsionadas_validacion.to_csv(r'dataset\\validacion' + '.csv');
+  letras_distorsionadas_validacion.to_csv(path+'\\validacion' + '.csv');
 
   return result
