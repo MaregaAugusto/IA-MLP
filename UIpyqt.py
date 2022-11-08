@@ -33,13 +33,13 @@ class App(QMainWindow):
         self.validarLetraButton.clicked.connect(self.validarLetra)
     
     def generateDataset(self):
+        print("hola")
         dataset = generador(self.cantObservaciones.value(),self.maxDistorsion.value(),self.sinDistorsion.value())
         if (dataset):
             self.showAlertGenerador(self.cantObservaciones.value())
             self.trainingTab.setEnabled(True)
     
     def entrenarDataset(self):
-        print('hola')
         capas = self.setCapas()
         funcTransferencia = self.setFuncTransferencia()
         self.datasetEntrenado = RedNeuronal(
@@ -49,7 +49,7 @@ class App(QMainWindow):
             self.precisionTr.value(), 
             self.cantEpocasTr.value(), 
             self.cantObservaciones.value(), 
-            [True, True, True]
+            funcTransferencia
             ) 
         self.datasetEntrenado.Propagation()
         self.datasetEntrenado.error_patron_v_total.pop(0)
@@ -107,19 +107,20 @@ class App(QMainWindow):
     def setFuncTransferencia(self):
         print(self.funcTransferenciaC1Tr.currentText())
         funcTransferencia = []
-        if(self.funcTransferenciaC1Tr.currentText() === "Sigmoidal"):
+        if(self.funcTransferenciaC1Tr.currentText() == "Sigmoidal"):
             funcTransferencia.append(True)
         else:
             funcTransferencia.append(False)
         if (self.c2CheckTr.isChecked()):
-            if(self.funcTransferenciaC2Tr.currentText() === "Sigmoidal"):
+            if(self.funcTransferenciaC2Tr.currentText() == "Sigmoidal"):
                 funcTransferencia.append(True)
             else:
                 funcTransferencia.append(False)
-        if(self.funcTransferenciaSalTr.currentText() === "Sigmoidal"):
+        if(self.funcTransferenciaSalTr.currentText() == "Sigmoidal"):
             funcTransferencia.append(True)
         else:
             funcTransferencia.append(False)
+        return funcTransferencia
 
     def showAlertGenerador(self, cant):
         dlg = QMessageBox(self)
