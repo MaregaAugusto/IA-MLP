@@ -576,10 +576,10 @@
            <property name="title">
             <string>Precision</string>
            </property>
-           <widget class="QSpinBox" name="precisionTr">
+           <widget class="QDoubleSpinBox" name="precisionTr">
             <property name="geometry">
              <rect>
-              <x>40</x>
+              <x>30</x>
               <y>40</y>
               <width>150</width>
               <height>20</height>
@@ -597,8 +597,14 @@
               <height>20</height>
              </size>
             </property>
+            <property name="decimals">
+             <number>1</number>
+            </property>
             <property name="maximum">
-             <number>100</number>
+             <double>1.000000000000000</double>
+            </property>
+            <property name="singleStep">
+             <double>0.100000000000000</double>
             </property>
            </widget>
           </widget>
