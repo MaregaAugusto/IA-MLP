@@ -1,11 +1,8 @@
 
 #@markdown Instalamos las librerias necesarias
-#!pip install pandas Faker
-import pandas as pd
-from faker import Faker
-import random
-import copy
-import numpy as np
+from pandas import DataFrame
+from random import randint, sample
+from copy import deepcopy
 from os import mkdir
 
 #@markdfrom os import mkdir
@@ -25,7 +22,6 @@ porcentajeTraining = 70
 #@markdown Generador.
 def generador(cantObs,maxDistorsion,sinDistorsion):
 	result = []
-	fake = Faker()
 	sinDist = (cantObs*sinDistorsion)/100
 	# Vamos a generar una letra de cada una para tener aproximadamente la misma cantidad de cada una
 
@@ -38,33 +34,31 @@ def generador(cantObs,maxDistorsion,sinDistorsion):
 			sinDist = sinDist - 1
 		else:
 			# Aleatorizamos la distorsión entre 1 y 30 (porque aca se hacen solo los distorcionados)
-			distorsion = random.randint(1,maxDistorsion + 1)
+			distorsion = randint(1,maxDistorsion + 1)
 
 		# Elegimos las letras del array de letras en orden
-		letra = copy.deepcopy(letras[selectorLetra])
+		letra = deepcopy(letras[selectorLetra])
 		# Bucle para reemplazar tantos bits como sea nuestra distorsión
-		contDist = 0;
 		for i in range(0, distorsion):
 			# Seleccionamos un bit entre 100
-			distX = random.randint(1, 100)
+			distX = randint(1, 100)
 	# Cambio de digito segun corresponda
 			if letra[distX] == 0:
-				letra[distX] = 1;
+				letra[distX] = 1
 			elif letra[distX] == 1:
-				letra[distX] = 0;
+				letra[distX] = 0
 
-		result.append(letra);
+		result.append(letra)
 		# Pasamos a la siguiente letra
 		selectorLetra = selectorLetra + 1
 		if selectorLetra > (len(letras) - 1):
 			selectorLetra = 0
 	
 	# desordenamos result
-	result = random.sample(result,len(result))
+	result = sample(result,len(result))
 
 	cantTraining = int((cantObs * porcentajeTraining)/100)
 	cantTest = int((cantObs * porcentajeTest)/100)
-	cantValidacion = int((cantObs * porcentajeValidacion)/100)
 
 	result_training = result[0:cantTraining]
 	result_test = result[(cantTraining):(cantTraining + cantTest)]
@@ -79,13 +73,13 @@ def generador(cantObs,maxDistorsion,sinDistorsion):
 		mkdir(path)
 	
 
-	letras_distorsionadas_training = pd.DataFrame(result_training);
-	letras_distorsionadas_training.to_csv(path+'\\entrenamiento' + '.csv');
+	letras_distorsionadas_training = DataFrame(result_training)
+	letras_distorsionadas_training.to_csv(path+'\\entrenamiento' + '.csv')
 
-	letras_distorsionadas_test = pd.DataFrame(result_test);
-	letras_distorsionadas_test.to_csv(path+'\\test' + '.csv');
+	letras_distorsionadas_test = DataFrame(result_test)
+	letras_distorsionadas_test.to_csv(path+'\\test' + '.csv')
 
-	letras_distorsionadas_validacion = pd.DataFrame(result_validacion);
-	letras_distorsionadas_validacion.to_csv(path+'\\validacion' + '.csv');
+	letras_distorsionadas_validacion = DataFrame(result_validacion)
+	letras_distorsionadas_validacion.to_csv(path+'\\validacion' + '.csv')
 
 	return result

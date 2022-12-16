@@ -61,6 +61,7 @@ class Pesos:
         self.path = path + str(self.salida) + '.json'
         self.pathValidacion = path + str(self.salida) + 'Validacion.json'
 
+    # carga los pesos si existe el archivo sino los crea
     def cargarPesos(self):
         if exists(self.path):
             with open(self.path, 'r') as file_json:
@@ -74,6 +75,7 @@ class Pesos:
                 self.pesosValidacion = load(file_json)
             self.pesosValidacion = JsontoArray(self.pesosValidacion)
 
+    # crea en archivos de pesos con valores aleatorios 
     def definirPesos(self):
         self.pesos = dict()
         self.pesos['0'] = ramdomPesos(self.entrada, self.oculta[0])
@@ -84,6 +86,7 @@ class Pesos:
         self.pesos[str(x+1)] = ramdomPesos(self.oculta[-1], self.salida)
         self.guardarJson()
 
+    # función para guardar los pesos en un archivo json
     def guardarJson(self, validacion = False):
         if validacion:
             self.pesosValidacion = ArraytoDict(self.pesosValidacion)

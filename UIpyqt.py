@@ -1,24 +1,19 @@
-import sys
-import pandas as pd
-import graphviz
-import pydot
-from PyQt5 import QtCore, uic, QtGui
-from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QDialog, QLabel, QVBoxLayout, QMessageBox
-from PyQt5.QtGui import QPixmap
-from PyQt5.QtCore import Qt
+from sys import argv, exit
+from PyQt5.uic import loadUi
+from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox
 from generador import generador
 from RedNeuronal import RedNeuronal
 
 class App(QMainWindow): 
     def __init__(self):
         super().__init__()
-        uic.loadUi('./UI.ui',self)
+        loadUi('./UI.ui',self)
 
-        #Generador
+        #Variables Tab Generador
         self.generarDatosButton.clicked.connect(self.generateDataset)
         self.dataset = []
 
-        #Training
+        #Variables Tab Training
         self.capas = []
         self.trainingTab.setEnabled(False)
         self.entrenarButton.clicked.connect(self.entrenarDataset)
@@ -28,17 +23,20 @@ class App(QMainWindow):
         self.c1CheckTr.setChecked(True)
         self.funcTransferenciaC2Tr.setEnabled(False)
 
-        #Ejecucion
+        #Variables Tab Ejecucion
         self.ejecucionTab.setEnabled(False)
         self.validarLetraButton.clicked.connect(self.validarLetra)
     
+    # Parametros: cantidad de observaciones, maxima distorsion y % sin distorsion
+    # Generamos el dataset y lo guardamos, en caso de exito habilitamos la tab de entrenamiento
     def generateDataset(self):
-        print("hola")
         dataset = generador(self.cantObservaciones.value(),self.maxDistorsion.value(),self.sinDistorsion.value())
         if (dataset):
             self.showAlertGenerador(self.cantObservaciones.value())
             self.trainingTab.setEnabled(True)
     
+    # Parametros: capas, coeficiente de entrenamiento, termino de momento, presicion, cantidad de epocas, cantidad de observaciones, funcion de transferencia
+    # Entrenamos el dataset generado anteriormente y habilitamos la tab de validacion
     def entrenarDataset(self):
         capas = self.setCapas()
         funcTransferencia = self.setFuncTransferencia()
@@ -53,10 +51,11 @@ class App(QMainWindow):
             ) 
         self.datasetEntrenado.Propagation()
         self.datasetEntrenado.error_patron_v_total.pop(0)
-        print("error de test ", (self.datasetEntrenado.error_patron_t_total - self.datasetEntrenado.error_patron_entrenamiento[-1]))
         self.ejecucionTab.setEnabled(True)
         self.showAlertTraining()
 
+    # Parametros: check de botones que forman la letra ingresada
+    # Validamos el input ingresado mediante la cuadricula 10x10 con botones, realizamos la propagacion hacia adelante y vemos a que letra se asemeja segun la red entrenada
     def validarLetra(self):
         letra = [
             self.button1.isChecked(), self.button2.isChecked(), self.button3.isChecked(), self.button4.isChecked(), self.button5.isChecked(), self.button6.isChecked(), self.button7.isChecked(), self.button8.isChecked(), self.button9.isChecked(), self.button10.isChecked(),
@@ -71,17 +70,14 @@ class App(QMainWindow):
             self.button1_10.isChecked(), self.button2_10.isChecked(), self.button3_10.isChecked(), self.button4_10.isChecked(), self.button5_10.isChecked(), self.button6_10.isChecked(), self.button7_10.isChecked(), self.button8_10.isChecked(), self.button9_10.isChecked(), self.button10_10.isChecked(),
         ]
         resultado = self.datasetEntrenado.ForwardPropagation(letra, True)
-        print(resultado)
         if resultado[0] > resultado[1] and resultado[0] > resultado[2]:
-            print("es una B")
             self.showAlertEjecucion("Es una B")
         elif resultado[1] > resultado[0] and resultado[1] > resultado[2]:
-            print("es una D")
             self.showAlertEjecucion("Es una D")
         elif resultado[2] > resultado[0] and resultado[2] > resultado[1]:
-            print("es una F")
             self.showAlertEjecucion("Es una F")
-        
+
+    # Funcion que controla el comportamiento de activacion/desactivacion de los inputs de capas segun se seleccione la cantidad en la etapa de entremiento (1 o 2 capas)    
     def activarCapa1Entrenamiento(self):
         self.c1CheckTr.setChecked(True)
         self.c2TrBox.setEnabled(False)
@@ -89,6 +85,7 @@ class App(QMainWindow):
         if (self.c2CheckTr.isChecked()):
             self.c2CheckTr.setChecked(False)
 
+    # Funcion que controla el comportamiento de activacion/desactivacion de los inputs de capas segun se seleccione la cantidad en la etapa de entremiento (1 o 2 capas)
     def activarCapa2Entrenamiento(self):
         self.c2CheckTr.setChecked(True)
         self.c2TrBox.setEnabled(True)
@@ -96,16 +93,16 @@ class App(QMainWindow):
         if (self.c1CheckTr.isChecked()):
             self.c1CheckTr.setChecked(False)
 
+    # Genera un array con la cantidad de capas seleccionadas en la etapa de entrenamiento
     def setCapas(self):
         if (self.c1CheckTr.isChecked()):
             capas = [self.neuronasC1Tr.value()]
         if (self.c2CheckTr.isChecked()):
             capas = [self.neuronasC1Tr.value(),self.neuronasC2Tr.value()]
-        print(capas)
         return capas
-    
+
+    # Genera un array con las funciones de transferencia seleccionadas en la etapa de entrenamiento
     def setFuncTransferencia(self):
-        print(self.funcTransferenciaC1Tr.currentText())
         funcTransferencia = []
         if(self.funcTransferenciaC1Tr.currentText() == "Sigmoidal"):
             funcTransferencia.append(True)
@@ -122,27 +119,31 @@ class App(QMainWindow):
             funcTransferencia.append(False)
         return funcTransferencia
 
+    # Genera una alerta cuando se genera correctamente el dataset
     def showAlertGenerador(self, cant):
         dlg = QMessageBox(self)
         dlg.setWindowTitle("AVISO!")
         dlg.setText("Se genero correctamente el dataset de " + str(cant) + " elementos")
         dlg.exec()
     
+    # Genera una alerta cuando se entrena correctamente el dataset
     def showAlertTraining(self):
         dlg = QMessageBox(self)
         dlg.setWindowTitle("AVISO!")
         dlg.setText("Se entreno correctamente el dataset")
         dlg.exec()
 
+    # Genera una alerta cuando se ejecuta correctamente y predice una letra
     def showAlertEjecucion(self, message):
             dlg = QMessageBox(self)
             dlg.setWindowTitle("EXITO!")
             dlg.setText(str(message))
             dlg.exec()
 
+#Funcion main de la interface
 if __name__ == '__main__':
-    app = QApplication(sys.argv)
+    app = QApplication(argv)
     GUI = App()
     GUI.showMaximized()
-    sys.exit(app.exec_())
+    exit(app.exec_())
     
