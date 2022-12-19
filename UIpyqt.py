@@ -3,6 +3,7 @@ from PyQt5.uic import loadUi
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox
 from generador import generador
 from RedNeuronal import RedNeuronal
+from matplotlib.pyplot import plot, show, figure, title, xlabel, ylabel, legend
 
 class App(QMainWindow): 
     def __init__(self):
@@ -30,9 +31,9 @@ class App(QMainWindow):
     # Parametros: cantidad de observaciones, maxima distorsion y % sin distorsion
     # Generamos el dataset y lo guardamos, en caso de exito habilitamos la tab de entrenamiento
     def generateDataset(self):
-        dataset = generador(self.cantObservaciones.value(),self.maxDistorsion.value(),self.sinDistorsion.value())
+        dataset = generador(int(self.cantObservaciones.currentText()))
         if (dataset):
-            self.showAlertGenerador(self.cantObservaciones.value())
+            self.showAlertGenerador(int(self.cantObservaciones.currentText()))
             self.trainingTab.setEnabled(True)
     
     # Parametros: capas, coeficiente de entrenamiento, termino de momento, presicion, cantidad de epocas, cantidad de observaciones, funcion de transferencia
@@ -46,13 +47,20 @@ class App(QMainWindow):
             self.termMomentoTr.value(), 
             self.precisionTr.value(), 
             self.cantEpocasTr.value(), 
-            self.cantObservaciones.value(), 
+            int(self.cantObservaciones.currentText()), 
             funcTransferencia
             ) 
-        self.datasetEntrenado.Propagation()
+        Presicion = self.datasetEntrenado.Propagation()
         self.datasetEntrenado.error_patron_v_total.pop(0)
+        plot(self.datasetEntrenado.error_patron_entrenamiento, marker='o', color='blue', label='Entrenamiento')
+        plot(self.datasetEntrenado.error_patron_v_total, color='red', label='Validacion')
+        xlabel('Epocas')
+        ylabel('Error de entrenamiento')
+        title('MSE')
+        legend()
+        show()
         self.ejecucionTab.setEnabled(True)
-        self.showAlertTraining()
+        self.showAlertTraining( Presicion)
 
     # Parametros: check de botones que forman la letra ingresada
     # Validamos el input ingresado mediante la cuadricula 10x10 con botones, realizamos la propagacion hacia adelante y vemos a que letra se asemeja segun la red entrenada
@@ -71,11 +79,11 @@ class App(QMainWindow):
         ]
         resultado = self.datasetEntrenado.ForwardPropagation(letra, True)
         if resultado[0] > resultado[1] and resultado[0] > resultado[2]:
-            self.showAlertEjecucion("Es una B")
+            self.showAlertEjecucion("Es una B ", resultado)
         elif resultado[1] > resultado[0] and resultado[1] > resultado[2]:
-            self.showAlertEjecucion("Es una D")
+            self.showAlertEjecucion("Es una D ", resultado)
         elif resultado[2] > resultado[0] and resultado[2] > resultado[1]:
-            self.showAlertEjecucion("Es una F")
+            self.showAlertEjecucion("Es una F ", resultado)
 
     # Funcion que controla el comportamiento de activacion/desactivacion de los inputs de capas segun se seleccione la cantidad en la etapa de entremiento (1 o 2 capas)    
     def activarCapa1Entrenamiento(self):
@@ -127,14 +135,22 @@ class App(QMainWindow):
         dlg.exec()
     
     # Genera una alerta cuando se entrena correctamente el dataset
-    def showAlertTraining(self):
+    def showAlertTraining(self, Presicion):
         dlg = QMessageBox(self)
         dlg.setWindowTitle("AVISO!")
-        dlg.setText("Se entreno correctamente el dataset")
+        mensaje = "La red neuronal se entreno correctamente \nCon una presición: "+ str(Presicion)
+        dlg.setText(mensaje)
         dlg.exec()
 
     # Genera una alerta cuando se ejecuta correctamente y predice una letra
-    def showAlertEjecucion(self, message):
+    def showAlertEjecucion(self, message, result):
+            letra = {
+                'B': result[0],
+                'D': result[1],
+                'F': result[2] 
+            }
+            for clave, valor in letra.items():
+                message += "\nPorcentaje " + clave + ": {0:.2f}".format((valor*100))+"%"
             dlg = QMessageBox(self)
             dlg.setWindowTitle("EXITO!")
             dlg.setText(str(message))

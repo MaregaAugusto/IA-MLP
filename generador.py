@@ -20,7 +20,7 @@ porcentajeTest = 10
 porcentajeTraining = 70
 
 #@markdown Generador.
-def generador(cantObs,maxDistorsion,sinDistorsion):
+def generador(cantObs,maxDistorsion = 30, sinDistorsion = 10):
 	result = []
 	sinDist = (cantObs*sinDistorsion)/100
 	# Vamos a generar una letra de cada una para tener aproximadamente la misma cantidad de cada una

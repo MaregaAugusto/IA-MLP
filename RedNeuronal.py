@@ -141,8 +141,8 @@ class RedNeuronal:
             self.error_patron_entrenamiento.append(error_patron)
             error_global = error_patron/iteracion
         # realizamos la propagación con la red de test
-        self.test()
-
+        precision = self.test()
+        return precision
     """
     esta funcion ejecuta una propagación hacia adelante y hacia atras en el caso de que estemos en modo entrenamiento
     parametros:
@@ -150,7 +150,7 @@ class RedNeuronal:
         is_entrenamiento: si es verdadero hace la propagación hacia atras
     
     """
-    def ejecucion(self, path, is_entrenamiento):
+    def ejecucion(self, path, is_entrenamiento, is_test = False):
         self.cp = Capa()
         flag = False
         error_patron = 0
@@ -169,6 +169,14 @@ class RedNeuronal:
                     
                     # Forward propagation
                     self.ForwardPropagation(entradaRed)
+
+                    if is_test:
+                        if self.activacion[-1][0] > self.activacion[-1][1] and self.activacion[-1][0] > self.activacion[-1][2] and clase == 'b':
+                            self.correctas += 1
+                        elif self.activacion[-1][1] > self.activacion[-1][0] and self.activacion[-1][1] > self.activacion[-1][2] and clase == 'd':
+                            self.correctas += 1
+                        elif self.activacion[-1][2] > self.activacion[-1][0] and self.activacion[-1][2] > self.activacion[-1][1] and clase == 'f':
+                            self.correctas += 1
                     
                     # Calculamos el error del patron
                     error_patron += self.cp.ErrorPatron(self.salida_deseada[clase], self.activacion[-1])
@@ -196,6 +204,7 @@ class RedNeuronal:
 
     # función que ejecuta la propagación hacia adelante con el dataset de test       
     def test(self):
-        self.error_patron_t_total, iteracion = self.ejecucion(self.pathTest, False)
-
+        self.correctas = 0
+        self.error_patron_t_total, iteracion = self.ejecucion(self.pathTest, False, True)
+        return ((self.correctas/iteracion)*100)
 
